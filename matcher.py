@@ -9,7 +9,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 
 EMBEDDING_MODEL = os.getenv("EMBEDDING_MODEL", "sentence-transformers/all-MiniLM-L6-v2")
 
-# Transparent baseline vocabulary; extend this for your target roles.
+
 SKILLS = {
     "python", "java", "javascript", "typescript", "sql", "mysql", "postgresql",
     "mongodb", "aws", "azure", "gcp", "docker", "kubernetes", "terraform",
@@ -140,14 +140,14 @@ def analyze_resume(resume_text: str, jd_text: str, use_llm: bool = False) -> dic
     missing = sorted(jd_skills - resume_skills)
     extra = sorted(resume_skills - jd_skills)
 
-    # Skill coverage is transparent and interpretable. Embedding similarity is shown separately.
+  
     skill_score = (len(matched) / len(jd_skills) * 100) if jd_skills else 0.0
     evidence = retrieve_relevant(resume_text, jd_text)
     semantic_score = (
         float(np.mean([item["similarity"] for item in evidence])) * 100
         if evidence else 0.0
     )
-    # Avoid presenting a raw embedding cosine as a calibrated probability.
+  
     overall_score = round(0.7 * skill_score + 0.3 * max(0.0, min(100.0, semantic_score)), 1)
 
     result = {
